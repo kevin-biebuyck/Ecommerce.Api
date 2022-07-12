@@ -1,4 +1,6 @@
 using Ecommerce.Api.Controllers;
+using Ecommerce.Api.Data;
+
 namespace Ecommerce.Api
 {
     public class Program
@@ -13,6 +15,7 @@ namespace Ecommerce.Api
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<ECommerceContext>();
 
             var app = builder.Build();
 
