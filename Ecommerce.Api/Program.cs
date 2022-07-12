@@ -1,3 +1,4 @@
+using Ecommerce.Api.Controllers;
 namespace Ecommerce.Api
 {
     public class Program
@@ -18,11 +19,19 @@ namespace Ecommerce.Api
             app.UseSwagger();
             app.UseSwaggerUI();
 
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            };
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
             app.MapControllers();
+
+            app.MapProductEndpoints();
 
             app.Run();
         }
