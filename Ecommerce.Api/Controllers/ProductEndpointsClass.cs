@@ -6,14 +6,19 @@ public static class ProductEndpointsClass
 {
     public static void MapProductEndpoints(this IEndpointRouteBuilder routes)
     {
-        routes.MapGet("/api/Product", async (ECommerceContext db) =>
-        {
-            return await db.Products.ToListAsync();
-        })
+        routes.MapGet("/api/products", async (string? search, ECommerceContext db) =>
+            {
+                var query = db.Products.AsQueryable();
+
+                if (search != null)
+                    query = query.Where(p => p.Name.Contains(search));
+
+                return await query.ToListAsync();
+            })
         .WithName("GetAllProducts")
         .Produces<List<Product>>(StatusCodes.Status200OK);
 
-        routes.MapGet("/api/Product/{id}", async (Guid id, ECommerceContext db) =>
+        routes.MapGet("/api/products/{id}", async (Guid id, ECommerceContext db) =>
         {
             return await db.Products.FindAsync(id)
                 is Product model
@@ -24,7 +29,7 @@ public static class ProductEndpointsClass
         .Produces<Product>(StatusCodes.Status200OK)
         .Produces(StatusCodes.Status404NotFound);
 
-        routes.MapPut("/api/Product/{id}", async (Guid id, Product product, ECommerceContext db) =>
+        routes.MapPut("/api/products/{id}", async (Guid id, Product product, ECommerceContext db) =>
             {
                 if (product.Price < 0)
                     return Results.BadRequest("The price cannot be under 0");
@@ -50,7 +55,7 @@ public static class ProductEndpointsClass
         .Produces(StatusCodes.Status204NoContent)
         .Produces(StatusCodes.Status400BadRequest);
 
-        routes.MapPost("/api/Product/", async (Product product, ECommerceContext db) =>
+        routes.MapPost("/api/products/", async (Product product, ECommerceContext db) =>
         {
             db.Products.Add(product);
             await db.SaveChangesAsync();
@@ -59,7 +64,7 @@ public static class ProductEndpointsClass
         .WithName("CreateProduct")
         .Produces<Product>(StatusCodes.Status201Created);
 
-        routes.MapDelete("/api/Product/{id}", async (Guid id, ECommerceContext db) =>
+        routes.MapDelete("/api/products/{id}", async (Guid id, ECommerceContext db) =>
         {
             if (await db.Products.FindAsync(id) is Product product)
             {
