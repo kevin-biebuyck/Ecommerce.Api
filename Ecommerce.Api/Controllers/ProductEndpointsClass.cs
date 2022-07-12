@@ -27,7 +27,7 @@ public static class ProductEndpointsClass
                 .Take(pageSizeNotNull)
                 .ToArrayAsync();
 
-            return new Paginated<Product>(pageNotNull, pageSizeNotNull, (totalItems / pageSizeNotNull) + (totalItems % pageSizeNotNull != 0 ? 1 : 0), items);
+            return new Paginated<Product>(pageNotNull, pageSizeNotNull, totalItems, items);
         })
         .WithName("GetAllProducts")
         .Produces<Paginated<Product>>(StatusCodes.Status200OK);

@@ -4,14 +4,14 @@
     {
         public int Page { get; }
         public int PageSize { get; }
-        public int TotalPages { get; }
+        public int TotalItems { get; }
         public TItem[] Items { get; }
 
-        public Paginated(int page, int pageSize, int totalPages, TItem[] items)
+        public Paginated(int page, int pageSize, int totalItems, TItem[] items)
         {
             Page = page;
             PageSize = pageSize;
-            TotalPages = totalPages;
+            TotalItems = totalItems;
             Items = items;
         }
     }
