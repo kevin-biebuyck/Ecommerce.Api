@@ -5,6 +5,7 @@ namespace Ecommerce.Api
 {
     public class Program
     {
+        private const string CorsPolicy = "CorsPolicy";
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
@@ -16,9 +17,16 @@ namespace Ecommerce.Api
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ECommerceContext>();
+            builder.Services.AddCors(c => c.AddPolicy(CorsPolicy, policyBuilder =>
+            {
+                policyBuilder
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin();
+            }));
 
             var app = builder.Build();
-
+            app.UseCors(CorsPolicy);
             app.UseSwagger();
             app.UseSwaggerUI();
 
