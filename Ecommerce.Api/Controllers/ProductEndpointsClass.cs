@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Ecommerce.Api.Data;
+using Ecommerce.Api.Models;
+
 namespace Ecommerce.Api.Controllers;
 
 public static class ProductEndpointsClass
@@ -17,15 +19,18 @@ public static class ProductEndpointsClass
                 query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
 
             // Pagination
-            var pageNotNull = page.GetValueOrDefault(1);
-            var pageSizeNotNull = pageSize.GetValueOrDefault(50);
-            return await query
-                .Skip((int)((pageNotNull - 1) * pageSizeNotNull))
-                .Take((int)pageSizeNotNull)
-                .ToListAsync();
+            var pageNotNull = (int)page.GetValueOrDefault(1);
+            var pageSizeNotNull = (int)pageSize.GetValueOrDefault(50);
+            var totalItems = await query.CountAsync();
+            var items = await query
+                .Skip((pageNotNull - 1) * pageSizeNotNull)
+                .Take(pageSizeNotNull)
+                .ToArrayAsync();
+
+            return new Paginated<Product>(pageNotNull, pageSizeNotNull, (totalItems / pageSizeNotNull) + (totalItems % pageSizeNotNull != 0 ? 1 : 0), items);
         })
         .WithName("GetAllProducts")
-        .Produces<List<Product>>(StatusCodes.Status200OK);
+        .Produces<Paginated<Product>>(StatusCodes.Status200OK);
 
         routes.MapGet("/api/products/{id}", async (Guid id, ECommerceContext db) =>
         {
