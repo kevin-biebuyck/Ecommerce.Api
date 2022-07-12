@@ -6,15 +6,24 @@ public static class ProductEndpointsClass
 {
     public static void MapProductEndpoints(this IEndpointRouteBuilder routes)
     {
-        routes.MapGet("/api/products", async (string? search, ECommerceContext db) =>
-            {
-                var query = db.Products.AsQueryable();
+        //Page 1 = first page
+        routes.MapGet("/api/products", async (string? search, uint? page, uint? pageSize, ECommerceContext db) =>
+        {
+            // Prepare query
+            var query = db.Products.AsQueryable();
 
-                if (search != null)
-                    query = query.Where(p => p.Name.Contains(search));
+            // Filter
+            if (search != null)
+                query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
 
-                return await query.ToListAsync();
-            })
+            // Pagination
+            var pageNotNull = page.GetValueOrDefault(1);
+            var pageSizeNotNull = pageSize.GetValueOrDefault(50);
+            return await query
+                .Skip((int)((pageNotNull - 1) * pageSizeNotNull))
+                .Take((int)pageSizeNotNull)
+                .ToListAsync();
+        })
         .WithName("GetAllProducts")
         .Produces<List<Product>>(StatusCodes.Status200OK);
 
